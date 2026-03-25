@@ -2,7 +2,12 @@ services:
   - type: web
     name: scandiweb-backend
     runtime: php
-    buildCommand: composer install --no-dev --optimize-autoloader
+    region: frankfurt
+    buildCommand: |
+      echo "Installing PHP dependencies..."
+      composer install --no-dev --optimize-autoloader
+      echo "PHP version:"
+      php -v
     startCommand: php -S 0.0.0.0:$PORT -t public
     envVars:
       - key: PHP_VERSION
@@ -33,3 +38,4 @@ databases:
     databaseName: scandiweb_ecommerce
     user: scandiweb
     plan: free
+    region: frankfurt

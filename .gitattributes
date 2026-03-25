@@ -1,0 +1,11 @@
+# Tell GitHub Linguist to properly detect PHP
+public/*.php linguist-language=PHP
+src/**/*.php linguist-language=PHP
+
+# Exclude build assets from language stats
+public/assets/* linguist-vendored
+client/dist/* linguist-vendored
+
+# Mark composer files as PHP
+composer.json linguist-language=PHP
+composer.lock linguist-language=PHP
