@@ -14,7 +14,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 define('BASE_PATH', dirname(__DIR__) . '/');
 
-Dotenv\Dotenv::createImmutable(BASE_PATH)->load();
+$dotenvPath = BASE_PATH . '.env';
+if (file_exists($dotenvPath)) {
+    Dotenv\Dotenv::createImmutable(BASE_PATH)->load();
+}
 
 include_once BASE_PATH . 'src/helpers.php';
 
