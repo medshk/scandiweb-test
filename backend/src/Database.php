@@ -17,16 +17,23 @@ class Database
         try {
             $this->connection = new PDO($dsn, $dbConfig['user'], $dbConfig['password'], [
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ]);
         } catch (\Exception $e) {
-            abort(500, 'Database connection failed');
+            file_put_contents(base_path('error.log'), $e->getMessage() . "\n", FILE_APPEND);
+            abort(500, 'Database connection failed: ' . $e->getMessage());
         }
     }
 
     public function query($query, $params = [])
     {
-        $this->statement = $this->connection->prepare($query);
-        $this->statement->execute($params);
+        try {
+            $this->statement = $this->connection->prepare($query);
+            $this->statement->execute($params);
+        } catch (\Exception $e) {
+            file_put_contents(base_path('error.log'), 'Query Error: ' . $e->getMessage() . "\nQuery: " . $query . "\n", FILE_APPEND);
+            throw $e;
+        }
 
         return $this;
     }
