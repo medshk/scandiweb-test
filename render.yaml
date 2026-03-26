@@ -3,6 +3,7 @@ services:
     name: scandiweb-backend
     runtime: php
     region: frankfurt
+    rootDir: backend
     buildCommand: |
       echo "Installing PHP dependencies..."
       composer install --no-dev --optimize-autoloader
