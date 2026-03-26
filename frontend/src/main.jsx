@@ -6,9 +6,10 @@ import { Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './assets/index.css';
 
-const graphqlEndpoint = import.meta.env.PROD
-  ? '/graphql'
-  : 'http://localhost:8000/graphql';
+const graphqlEndpoint = import.meta.env.VITE_GRAPHQL_ENDPOINT
+  || (import.meta.env.PROD
+    ? '/graphql'
+    : 'http://localhost:8000/graphql');
 
 const apolloClient = new ApolloClient({
   uri: graphqlEndpoint,
