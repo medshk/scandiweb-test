@@ -32,5 +32,4 @@ databases:
   - name: scandiweb-mysql
     databaseName: scandiweb_ecommerce
     user: scandiweb
-    plan: starter
     region: frankfurt
