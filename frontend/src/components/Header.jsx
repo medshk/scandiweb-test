@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useLazyQuery } from '@apollo/client';
-import { Cart, CartModal, CurrencySwitcher, Loading, Logo, NavigationMenu } from '.';
+import { Cart, CartModal, Loading, Logo, NavigationMenu } from '.';
 import { useDataContext } from '../DataContext';
 import { GET_CATEGORIES_AND_PRODUCTS, GET_PRODUCTS } from '../graphql/queries';
 
@@ -11,7 +11,6 @@ const Header = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [currencies, setCurrencies] = useState([]);
 
   const toggleModal = () => setShowModal((prevState) => !prevState);
 
@@ -30,7 +29,6 @@ const Header = () => {
       onCompleted: (data) => {
         setProductsData(data.products);
         setCategories(data.categories.map((category) => category.name));
-        setCurrencies(data.currencies || []);
         setSelectedCategory(category ?? data.categories[0]?.name);
       },
     }
@@ -76,10 +74,6 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-4 z-10">
-          {currencies.length > 0 && (
-            <CurrencySwitcher currencies={currencies} />
-          )}
-
           <button
             className="relative cursor-pointer py-6"
             onClick={toggleModal}
