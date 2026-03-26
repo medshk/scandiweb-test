@@ -1,18 +1,10 @@
 services:
   - type: web
     name: scandiweb-backend
-    runtime: php
+    runtime: docker
     region: frankfurt
     rootDir: backend
-    buildCommand: |
-      echo "Installing PHP dependencies..."
-      composer install --no-dev --optimize-autoloader
-      echo "PHP version:"
-      php -v
-    startCommand: php -S 0.0.0.0:$PORT -t public
     envVars:
-      - key: PHP_VERSION
-        value: 8.1
       - key: DB_HOST
         fromDatabase:
           name: scandiweb-mysql
@@ -21,11 +13,11 @@ services:
         fromDatabase:
           name: scandiweb-mysql
           property: port
-      - key: DB_DATABASE
+      - key: DB_NAME
         fromDatabase:
           name: scandiweb-mysql
           property: database
-      - key: DB_USERNAME
+      - key: DB_USER
         fromDatabase:
           name: scandiweb-mysql
           property: user
@@ -33,6 +25,8 @@ services:
         fromDatabase:
           name: scandiweb-mysql
           property: password
+      - key: DB_CHARSET
+        value: utf8mb4
 
 databases:
   - name: scandiweb-mysql
