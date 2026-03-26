@@ -7,29 +7,27 @@ services:
     envVars:
       - key: DB_HOST
         fromDatabase:
-          name: scandiweb-mysql
+          name: scandiweb-db
           property: host
       - key: DB_PORT
         fromDatabase:
-          name: scandiweb-mysql
+          name: scandiweb-db
           property: port
       - key: DB_NAME
         fromDatabase:
-          name: scandiweb-mysql
+          name: scandiweb-db
           property: database
       - key: DB_USER
         fromDatabase:
-          name: scandiweb-mysql
+          name: scandiweb-db
           property: user
       - key: DB_PASSWORD
         fromDatabase:
-          name: scandiweb-mysql
+          name: scandiweb-db
           property: password
-      - key: DB_CHARSET
-        value: utf8mb4
 
 databases:
-  - name: scandiweb-mysql
+  - name: scandiweb-db
     databaseName: scandiweb_ecommerce
-    user: scandiweb
+    user: scandiweb_user
     region: frankfurt
