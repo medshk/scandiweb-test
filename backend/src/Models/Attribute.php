@@ -42,7 +42,7 @@ class Attribute extends Model
                 'id' => $item['id'],
                 'attribute_id' => $attributeId,
                 'value' => $item['value'],
-                'displayValue' => $item['displayValue'],
+                'displayValue' => $item['displayValue'] ?? $item['value'],
             ];
         }
 
