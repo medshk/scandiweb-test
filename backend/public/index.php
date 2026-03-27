@@ -23,6 +23,20 @@ include_once BASE_PATH . 'src/helpers.php';
 
 $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
     $r->post('/graphql', [App\GraphQL\Controller::class, 'handle']);
+    $r->get('/debug', function() {
+        header('Content-Type: application/json');
+        try {
+            $dbConfig = require BASE_PATH . 'src/config/database.php';
+            $dsn = 'pgsql:host=' . $dbConfig['host'] . ';port=' . $dbConfig['port'] . ';dbname=' . $dbConfig['dbname'];
+            $pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['password'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            $stmt = $pdo->query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
+            $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            echo json_encode(['status' => 'connected', 'tables' => $tables, 'config' => ['host' => $dbConfig['host'], 'dbname' => $dbConfig['dbname'], 'user' => $dbConfig['user']]]);
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage(), 'config' => ['host' => $dbConfig['host'] ?? 'not set', 'dbname' => $dbConfig['dbname'] ?? 'not set', 'user' => $dbConfig['user'] ?? 'not set']]);
+        }
+        exit;
+    });
 });
 
 $routeInfo = $dispatcher->dispatch(
