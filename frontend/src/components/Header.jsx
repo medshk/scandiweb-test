@@ -96,7 +96,7 @@ const Header = () => {
           data-testid="cart-overlay"
           style={{
             position: 'fixed',
-            top: 0,
+            top: '80px',
             left: 0,
             right: 0,
             bottom: 0,
@@ -108,7 +108,7 @@ const Header = () => {
           <div
             style={{
               position: 'absolute',
-              top: '80px',
+              top: 0,
               left: 0,
               right: 0,
               bottom: 0,
@@ -120,7 +120,7 @@ const Header = () => {
             style={{
               position: 'absolute',
               right: 0,
-              top: '80px',
+              top: 0,
               bottom: 0,
               width: '400px',
               backgroundColor: 'white',
