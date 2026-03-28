@@ -31,7 +31,9 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
             $pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['password'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
             $stmt = $pdo->query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
             $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
-            echo json_encode(['status' => 'connected', 'tables' => $tables, 'config' => ['host' => $dbConfig['host'], 'dbname' => $dbConfig['dbname'], 'user' => $dbConfig['user']]]);
+            $stmt = $pdo->query('SELECT * FROM products LIMIT 1');
+            $rawProduct = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode(['status' => 'connected', 'tables' => $tables, 'rawProduct' => $rawProduct, 'config' => ['host' => $dbConfig['host'], 'dbname' => $dbConfig['dbname'], 'user' => $dbConfig['user']]]);
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage(), 'config' => ['host' => $dbConfig['host'] ?? 'not set', 'dbname' => $dbConfig['dbname'] ?? 'not set', 'user' => $dbConfig['user'] ?? 'not set']]);
         }
