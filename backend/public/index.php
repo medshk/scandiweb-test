@@ -33,7 +33,9 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
             $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
             $stmt = $pdo->query('SELECT * FROM products LIMIT 1');
             $rawProduct = $stmt->fetch(PDO::FETCH_ASSOC);
-            echo json_encode(['status' => 'connected', 'tables' => $tables, 'rawProduct' => $rawProduct, 'config' => ['host' => $dbConfig['host'], 'dbname' => $dbConfig['dbname'], 'user' => $dbConfig['user']]]);
+            $stmt = $pdo->query("SELECT * FROM product_attributes WHERE attribute_id = 'Color' OR attribute_id = 'color' LIMIT 5");
+            $rawAttributes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode(['status' => 'connected', 'tables' => $tables, 'rawProduct' => $rawProduct, 'rawAttributes' => $rawAttributes, 'config' => ['host' => $dbConfig['host'], 'dbname' => $dbConfig['dbname'], 'user' => $dbConfig['user']]]);
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage(), 'config' => ['host' => $dbConfig['host'] ?? 'not set', 'dbname' => $dbConfig['dbname'] ?? 'not set', 'user' => $dbConfig['user'] ?? 'not set']]);
         }
