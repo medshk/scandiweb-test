@@ -37,6 +37,12 @@ class Product extends Model
 
     private static function fetchProductDetails(&$product)
     {
+        // Map lowercase column names to camelCase for GraphQL
+        if (isset($product['instock'])) {
+            $product['inStock'] = $product['instock'];
+            unset($product['instock']);
+        }
+
         $gallery = json_decode($product['gallery'], true);
         $product['gallery'] = $gallery !== null && is_array($gallery) ? $gallery : [];
 
