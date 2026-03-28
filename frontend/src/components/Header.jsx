@@ -94,15 +94,39 @@ const Header = () => {
       {isCartOpen && (
         <div
           data-testid="cart-overlay"
-          className="fixed inset-0 z-50 flex"
-          style={{ visibility: 'visible' }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            display: 'block',
+            visibility: 'visible',
+          }}
         >
           <div
-            className="absolute inset-0 bg-black bg-opacity-40"
-            style={{ top: '80px' }}
+            style={{
+              position: 'absolute',
+              top: '80px',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            }}
             onClick={toggleModal}
           ></div>
-          <div className="absolute right-0 top-[80px] bottom-0 w-[400px] bg-white shadow-lg overflow-y-auto">
+          <div
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: '80px',
+              bottom: 0,
+              width: '400px',
+              backgroundColor: 'white',
+              overflowY: 'auto',
+            }}
+          >
             <CartModal cartItems={cartItems} />
           </div>
         </div>
