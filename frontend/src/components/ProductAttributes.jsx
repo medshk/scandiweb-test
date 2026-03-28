@@ -84,7 +84,7 @@ const ProductAttributes = ({
           className={isModalView ? 'mt-2' : 'mt-4'}
           data-testid={`${
             isModalView || isCartPageView ? 'cart-item' : 'product'
-          }-attribute-${attributeSet.name.replace(/\s+/g, '-')}`}
+          }-attribute-${attributeSet.name.toLowerCase().replace(/\s+/g, '-')}`}
         >
           <h3
             className={`${
@@ -118,7 +118,7 @@ const ProductAttributes = ({
                   disabled={!product.inStock}
                   data-testid={`${
                     isModalView || isCartPageView ? 'cart-item' : 'product'
-                  }-attribute-${attributeSet.name.replace(/\s+/g, '-')}-${
+                  }-attribute-${attributeSet.name.toLowerCase().replace(/\s+/g, '-')}-${
                     attribute.displayValue.replace(/\s+/g, '-')
                   }${
                     isAttributeValueSelected(attribute) ? '-selected' : ''
@@ -144,7 +144,7 @@ const ProductAttributes = ({
                   onClick={() => handleAttributeClick(attribute)}
                   data-testid={`${
                     isModalView || isCartPageView ? 'cart-item' : 'product'
-                  }-attribute-${attributeSet.name.replace(
+                  }-attribute-${attributeSet.name.toLowerCase().replace(
                     /\s+/g,
                     '-'
                   )}-${attribute.displayValue.replace(/\s+/g, '-')}${
