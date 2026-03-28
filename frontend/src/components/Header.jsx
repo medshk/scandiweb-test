@@ -7,12 +7,11 @@ import { GET_CATEGORIES_AND_PRODUCTS, GET_PRODUCTS } from '../graphql/queries';
 
 const Header = () => {
   const { category } = useParams();
-  const { cartItems, setSelectedCategory, setProductsData } = useDataContext();
+  const { cartItems, setSelectedCategory, setProductsData, isCartOpen, setIsCartOpen } = useDataContext();
 
-  const [showModal, setShowModal] = useState(false);
   const [categories, setCategories] = useState([]);
 
-  const toggleModal = () => setShowModal((prevState) => !prevState);
+  const toggleModal = () => setIsCartOpen((prevState) => !prevState);
 
   const [fetchProducts] = useLazyQuery(GET_PRODUCTS, {
     onCompleted: (data) => setProductsData(data.products),
@@ -40,8 +39,8 @@ const Header = () => {
   }, [fetchData]);
 
   useEffect(() => {
-    document.body.style.overflowY = showModal ? 'hidden' : 'auto';
-  }, [showModal]);
+    document.body.style.overflowY = isCartOpen ? 'hidden' : 'auto';
+  }, [isCartOpen]);
 
   if (dataError) {
     return (
@@ -92,7 +91,7 @@ const Header = () => {
         </div>
       </header>
 
-      {showModal && (
+      {isCartOpen && (
         <div data-testid="cart-overlay">
           <div
             className="fixed inset-x-0 bottom-0 z-30 bg-black bg-opacity-40"

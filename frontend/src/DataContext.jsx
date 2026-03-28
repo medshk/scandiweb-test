@@ -19,6 +19,7 @@ export const DataProvider = ({ children }) => {
   const [selectedCurrency, setSelectedCurrency] = useState(
     localStorage.getItem('selectedCurrency') || 'USD'
   );
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const changeCurrency = (currencyLabel) => {
     setSelectedCurrency(currencyLabel);
@@ -81,6 +82,7 @@ export const DataProvider = ({ children }) => {
 
     setCartItems(existingCartItems);
     localStorage.setItem('cartItems', JSON.stringify(existingCartItems));
+    setIsCartOpen(true);
 
     toast.success('Item added to cart! 🛒');
   };
@@ -170,6 +172,8 @@ export const DataProvider = ({ children }) => {
         updateCartItemQuantity,
         updateCartItemAttribute,
         emptyCart,
+        isCartOpen,
+        setIsCartOpen,
       }}
     >
       {children}
