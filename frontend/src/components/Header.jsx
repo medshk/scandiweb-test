@@ -92,13 +92,13 @@ const Header = () => {
       </header>
 
       {isCartOpen && (
-        <div data-testid="cart-overlay">
+        <div data-testid="cart-overlay" className="fixed inset-0 z-50">
           <div
-            className="fixed inset-x-0 bottom-0 z-30 bg-black bg-opacity-40"
+            className="absolute inset-0 bg-black bg-opacity-40"
             style={{ top: '80px' }}
             onClick={toggleModal}
           ></div>
-          <div className="relative z-40 flex justify-end">
+          <div className="absolute right-0 top-[80px] bottom-0 w-[400px] bg-white shadow-lg overflow-y-auto">
             <CartModal cartItems={cartItems} />
           </div>
         </div>
