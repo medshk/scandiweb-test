@@ -2,11 +2,17 @@
 
 namespace App\Models;
 
-class Product extends Model
+use App\Database;
+
+abstract class Product extends Model
 {
+    protected static string $table = 'products';
+
+    abstract public function getCategoryType(): string;
+
     public static function all(?string $category = null): array
     {
-        $products = new static();
+        $db = new Database();
         $query = 'SELECT * FROM ' . static::$table;
         $params = [];
 
@@ -15,7 +21,7 @@ class Product extends Model
             $params['category'] = $category;
         }
 
-        $products = $products->db->query($query, $params)->get();
+        $products = $db->query($query, $params)->get();
 
         foreach ($products as &$product) {
             self::fetchProductDetails($product);
@@ -35,6 +41,22 @@ class Product extends Model
         return $product;
     }
 
+    public static function findBasic(string $id): ?array
+    {
+        $db = new Database();
+        $product = $db->query(
+            'SELECT id, name, inStock FROM ' . static::$table . ' WHERE id = :id LIMIT 1',
+            ['id' => $id]
+        )->fetch();
+
+        if ($product && isset($product['instock'])) {
+            $product['inStock'] = $product['instock'];
+            unset($product['instock']);
+        }
+
+        return $product ?: null;
+    }
+
     private static function fetchProductDetails(&$product)
     {
         // Map lowercase column names to camelCase for GraphQL
@@ -45,9 +67,5 @@ class Product extends Model
 
         $gallery = json_decode($product['gallery'], true);
         $product['gallery'] = $gallery !== null && is_array($gallery) ? $gallery : [];
-
-        $product['prices'] = Price::getByProductId($product['id']);
-
-        $product['attributes'] = Attribute::getByProductId($product['id']);
     }
 }

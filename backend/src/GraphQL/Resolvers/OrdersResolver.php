@@ -5,13 +5,17 @@ namespace App\GraphQL\Resolvers;
 use App\Models\Order;
 use App\Database;
 use App\Models\OrderItem;
+use App\Models\Price;
+use App\Models\Product;
+use App\Models\ProductAttribute;
+use RuntimeException;
 
 class OrdersResolver
 {
     public static function store(array $args): string
     {
         if (empty($args['items'])) {
-            abort(400, 'Items are required');
+            throw new RuntimeException('Items are required');
         }
 
         $db = new Database();
@@ -20,7 +24,7 @@ class OrdersResolver
         try {
             $orderResult = Order::create($db);
             if (!$orderResult['success']) {
-                abort(500, $orderResult['error']);
+                throw new RuntimeException($orderResult['error']);
             }
             $orderId = $orderResult['orderId'];
 
@@ -28,13 +32,13 @@ class OrdersResolver
             $currency = null;
 
             foreach ($args['items'] as $item) {
-                self::validateItemAttributes($db, $item);
+                self::validateItemAttributes($item);
 
-                $productDetails = self::calculatePaidAmount($db, $item);
+                $productDetails = self::calculatePaidAmount($item);
 
                 $insertItemResult = OrderItem::insertItem($db, $orderId, $productDetails);
                 if (!$insertItemResult['success']) {
-                    abort(500, $insertItemResult['error']);
+                    throw new RuntimeException($insertItemResult['error']);
                 }
                 $totalAmount += $productDetails['paidAmount'];
                 if ($currency === null) {
@@ -44,7 +48,7 @@ class OrdersResolver
 
             $updateOrderResult = Order::update($db, $orderId, $totalAmount, $currency);
             if (!$updateOrderResult['success']) {
-                abort(500, $updateOrderResult['error']);
+                throw new RuntimeException($updateOrderResult['error']);
             }
 
             $db->commit();
@@ -56,63 +60,52 @@ class OrdersResolver
         }
     }
 
-    private static function validateItemAttributes(Database $db, array $item): void
+    private static function validateItemAttributes(array $item): void
     {
         $productId = $item['productId'];
 
         if (!isset($productId)) {
-            abort(400, 'Product ID is required');
+            throw new RuntimeException('Product ID is required');
         }
 
-        $product = $db->query('SELECT inStock, name FROM products WHERE id = ?', [$productId])->fetch();
+        $product = Product::findBasic($productId);
 
         if (!$product) {
-            abort(400, 'Product not found');
+            throw new RuntimeException('Product not found');
         }
 
         if (!$product['inStock']) {
-            abort(400, "Unfortunately, '{$product['name']}' is out of stock. Please check back later.");
+            throw new RuntimeException("Unfortunately, '{$product['name']}' is out of stock. Please check back later.");
         }
 
-        $attributeCount = $db->query(
-            'SELECT COUNT(DISTINCT attribute_id) FROM product_attributes WHERE product_id = ?',
-            [$productId]
-        )->fetchColumn();
+        $attributeCount = ProductAttribute::countByProductId($productId);
 
         if (!isset($item['attributeValues']) || $attributeCount !== count($item['attributeValues'])) {
-            abort(400, 'Attribute values are required');
+            throw new RuntimeException('Attribute values are required');
         }
 
-        // iterate over attributeValues and validate each attribute exists
         foreach ($item['attributeValues'] as $attribute) {
-            $result = $db->query(
-                'SELECT COUNT(*) FROM product_attributes WHERE id = ? AND value = ? LIMIT 1',
-                [$attribute['id'], $attribute['value']]
-            );
-
-            if ($result->fetchColumn() == 0) {
-                abort(400, "Oops! '{$product['name']}' with '{$attribute['value']}' attribute does not exist or is invalid. Please check and try again.");
+            if (!ProductAttribute::valueExists($productId, $attribute['attributeId'], $attribute['value'])) {
+                throw new RuntimeException("Oops! '{$product['name']}' with '{$attribute['value']}' attribute does not exist or is invalid. Please check and try again.");
             }
         }
     }
 
-    private static function calculatePaidAmount(Database $db, array $item): array
+    private static function calculatePaidAmount(array $item): array
     {
         $productId = $item['productId'];
         $quantity = $item['quantity'] ?? 1;
 
-        $productQuery = $db->query('SELECT name FROM products WHERE id = ?', [$productId]);
-        $product = $productQuery->fetch();
+        $product = Product::findBasic($productId);
 
         if (!$product) {
-            abort(400, 'Product not found');
+            throw new RuntimeException('Product not found');
         }
 
-        $priceQuery = $db->query('SELECT amount, currency FROM prices WHERE product_id = ?', [$productId]);
-        $price = $priceQuery->fetch();
+        $price = Price::findByProductId($productId);
 
         if (!$price) {
-            abort(500, 'Price not found for product');
+            throw new RuntimeException('Price not found for product');
         }
 
         $paidAmount = $price['amount'] * $quantity;
@@ -120,7 +113,7 @@ class OrdersResolver
 
         $formattedAttributeValues = [];
         foreach ($item['attributeValues'] as $attribute) {
-            $formattedAttributeValues[strtolower($attribute['id'])] = $attribute['value'];
+            $formattedAttributeValues[strtolower($attribute['attributeId'])] = $attribute['value'];
         }
         $attributeValuesJson = json_encode([$formattedAttributeValues]);
 

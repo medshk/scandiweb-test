@@ -13,6 +13,7 @@ class AttributeValueInputType extends InputObjectType
             'name' => 'AttributeValueInput',
             'fields' => [
                 'id' => ['type' => Type::nonNull(Type::string())],
+                'attributeId' => ['type' => Type::nonNull(Type::string())],
                 'value' => ['type' => Type::nonNull(Type::string())],
             ],
         ]);

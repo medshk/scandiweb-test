@@ -7,13 +7,12 @@ import { useDataContext } from '../../DataContext';
 
 function PlaceOrderBtn({ className }) {
   const [placeOrder, { loading }] = useMutation(PLACE_ORDER);
-  const { emptyCart } = useDataContext();
+  const { emptyCart, cartItems } = useDataContext();
+  const isEmpty = cartItems.length === 0;
 
   const handlePlaceOrder = async () => {
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-
-    if (!cartItems.length) {
-      return toast.error('Cart is empty! 🛒');
+    if (isEmpty) {
+      return;
     }
 
     const orderInput = {
@@ -23,6 +22,7 @@ function PlaceOrderBtn({ className }) {
           quantity: item.quantity,
           attributeValues: item.selectedAttributes.map((attr) => ({
             id: attr.id,
+            attributeId: attr.attributeId,
             value: attr.value,
           })),
         };
@@ -62,7 +62,7 @@ function PlaceOrderBtn({ className }) {
         className ? ' ' + className : ''
       }`}
       onClick={handlePlaceOrder}
-      disabled={loading}
+      disabled={loading || isEmpty}
       data-testid="place-order-btn"
     >
       {loading && <Spinner className="w-4 h-4 mr-2" />}

@@ -21,31 +21,36 @@ if (file_exists($dotenvPath)) {
 
 include_once BASE_PATH . 'src/helpers.php';
 
+$allowedOrigins = [
+    'https://your-frontend-url.web.app',
+    'https://your-frontend-url.firebaseapp.com',
+    'http://localhost:5173',
+];
+
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowedOrigins)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+}
+
 $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
-    $r->post('/graphql', [App\GraphQL\Controller::class, 'handle']);
-    $r->get('/debug', function() {
+    $r->get('/health', function() {
         header('Content-Type: application/json');
-        try {
-            $dbConfig = require BASE_PATH . 'src/config/database.php';
-            $dsn = 'pgsql:host=' . $dbConfig['host'] . ';port=' . $dbConfig['port'] . ';dbname=' . $dbConfig['dbname'];
-            $pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['password'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-            $stmt = $pdo->query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
-            $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
-            $stmt = $pdo->query('SELECT * FROM products LIMIT 1');
-            $rawProduct = $stmt->fetch(PDO::FETCH_ASSOC);
-            $stmt = $pdo->query("SELECT * FROM product_attributes WHERE attribute_id = 'Color' OR attribute_id = 'color' LIMIT 5");
-            $rawAttributes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode(['status' => 'connected', 'tables' => $tables, 'rawProduct' => $rawProduct, 'rawAttributes' => $rawAttributes, 'config' => ['host' => $dbConfig['host'], 'dbname' => $dbConfig['dbname'], 'user' => $dbConfig['user']]]);
-        } catch (Exception $e) {
-            echo json_encode(['status' => 'error', 'message' => $e->getMessage(), 'config' => ['host' => $dbConfig['host'] ?? 'not set', 'dbname' => $dbConfig['dbname'] ?? 'not set', 'user' => $dbConfig['user'] ?? 'not set']]);
-        }
+        echo json_encode(['status' => 'healthy']);
         exit;
     });
+
+    $r->post('/graphql', [App\GraphQL\Controller::class, 'handle']);
 });
+
+$requestUri = $_SERVER['REQUEST_URI'];
+if (false !== $pos = strpos($requestUri, '?')) {
+    $requestUri = substr($requestUri, 0, $pos);
+}
+$requestUri = rawurldecode($requestUri);
 
 $routeInfo = $dispatcher->dispatch(
     $_SERVER['REQUEST_METHOD'],
-    $_SERVER['REQUEST_URI']
+    $requestUri
 );
 
 switch ($routeInfo[0]) {

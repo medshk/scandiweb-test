@@ -30,37 +30,33 @@ function CartModal({ cartItems = [] }) {
         {' '}{totalItems} item{totalItems === 1 ? '' : 's'}
       </h2>
 
-      {totalItems === 0 ? (
-        <p className="mt-2 text-gray-500">Your bag is empty.</p>
-      ) : (
-        <>
-          <div className="py-2 space-y-8 overflow-y-auto max-h-[420px]">
-            {cartItems.map((item) => (
-              <CartModalItem key={item.id} item={item} />
-            ))}
-          </div>
-
-          <div className="pt-6 mt-4">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="font-medium font-roboto">Total</h3>
-              <div className="font-bold" data-testid="cart-total">
-                {`${currencySymbol}${totalPrice}`}
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Link
-                to="/cart"
-                className="flex-1 py-3 text-sm text-center uppercase transition-colors border border-text hover:bg-text hover:text-white"
-                onClick={() => (document.body.style.overflowY = 'auto')}
-              >
-                View Bag
-              </Link>
-              <PlaceOrderBtn className="flex-1 !px-4 !text-sm" />
-            </div>
-          </div>
-        </>
+      {totalItems > 0 && (
+        <div className="py-2 space-y-8 overflow-y-auto max-h-[420px]">
+          {cartItems.map((item) => (
+            <CartModalItem key={item.id} item={item} />
+          ))}
+        </div>
       )}
+
+      <div className="pt-6 mt-4">
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="font-medium font-roboto">Total</h3>
+          <div className="font-bold" data-testid="cart-total">
+            {`${currencySymbol}${totalPrice}`}
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <Link
+            to="/cart"
+            className="flex-1 py-3 text-sm text-center uppercase transition-colors border border-text hover:bg-text hover:text-white"
+            onClick={() => (document.body.style.overflowY = 'auto')}
+          >
+            View Bag
+          </Link>
+          <PlaceOrderBtn className="flex-1 !px-4 !text-sm" />
+        </div>
+      </div>
     </section>
   );
 }

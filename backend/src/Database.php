@@ -12,7 +12,15 @@ class Database
     public function __construct()
     {
         $dbConfig = require base_path('src/config/database.php') ?? [];
-        $dsn = 'pgsql:host=' . $dbConfig['host'] . ';port=' . $dbConfig['port'] . ';dbname=' . $dbConfig['dbname'];
+        $driver = $_ENV['DB_DRIVER'] ?? 'mysql';
+        $host = $dbConfig['host'];
+        if ($driver === 'pgsql') {
+            $dsn = 'pgsql:host=' . $host . ';port=' . $dbConfig['port'] . ';dbname=' . $dbConfig['dbname'];
+        } elseif (str_starts_with($host, '/')) {
+            $dsn = 'mysql:unix_socket=' . $host . ';dbname=' . $dbConfig['dbname'] . ';charset=' . $dbConfig['charset'];
+        } else {
+            $dsn = 'mysql:host=' . $host . ';port=' . $dbConfig['port'] . ';dbname=' . $dbConfig['dbname'] . ';charset=' . $dbConfig['charset'];
+        }
 
         try {
             $this->connection = new PDO($dsn, $dbConfig['user'], $dbConfig['password'], [

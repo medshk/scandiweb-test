@@ -3,6 +3,7 @@
 namespace App\GraphQL\Resolvers;
 
 use App\Models\Product;
+use App\Factories\ProductFactory;
 
 class ProductsResolver
 {
@@ -13,6 +14,13 @@ class ProductsResolver
 
     public static function show(string $productId): array
     {
-        return Product::find($productId);
+        $product = Product::find($productId);
+
+        if ($product) {
+            $productInstance = ProductFactory::createFromData($product);
+            $product['categoryType'] = $productInstance->getCategoryType();
+        }
+
+        return $product;
     }
 }

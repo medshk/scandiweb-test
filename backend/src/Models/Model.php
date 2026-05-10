@@ -21,16 +21,20 @@ abstract class Model
 
     public static function all(): array
     {
-        return (new static)->db->query('SELECT * FROM ' . static::$table)->get();
+        $db = new Database();
+        return $db->query('SELECT * FROM ' . static::$table)->get();
     }
 
     public static function find(string $value, ?string $column = 'id'): ?array
     {
-        return (new static)->db->query(
+        $db = new Database();
+        $result = $db->query(
             'SELECT * FROM ' . static::$table . ' WHERE ' . $column . ' = :value LIMIT 1',
             [
                 'value' => $value,
             ]
-        )->fetchOrFail();
+        )->fetch();
+
+        return $result ?: null;
     }
 }

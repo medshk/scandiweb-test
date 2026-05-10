@@ -4,6 +4,7 @@ namespace App\Models;
 
 class Price extends Model
 {
+    protected static string $table = 'prices';
     public static function getByProductId($productId)
     {
         $prices = (new static)->db->query(
@@ -34,5 +35,15 @@ class Price extends Model
         }
 
         return $productPrices;
+    }
+
+    public static function findByProductId(string $productId): ?array
+    {
+        $price = (new static)->db->query(
+            'SELECT amount, currency FROM ' . static::$table . ' WHERE product_id = :productId LIMIT 1',
+            ['productId' => $productId]
+        )->fetch();
+
+        return $price ?: null;
     }
 }

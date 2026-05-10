@@ -49,7 +49,7 @@ function ProductCard({ product = {} }) {
             {product.brand} {product.name}
           </h3>
           <div className={`font-medium text-lg font-roboto-condensed ${!product.inStock ? 'text-muted' : ''}`}>
-            {price?.currency?.symbol}{price?.amount}
+            {price?.currency?.symbol}{parseFloat(price?.amount || 0).toFixed(2)}
           </div>
         </div>
       </div>

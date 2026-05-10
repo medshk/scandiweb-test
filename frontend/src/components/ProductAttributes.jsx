@@ -119,7 +119,7 @@ const ProductAttributes = ({
                   data-testid={`${
                     isModalView || isCartPageView ? 'cart-item' : 'product'
                   }-attribute-${attributeSet.name.toLowerCase().replace(/\s+/g, '-')}-${
-                    attribute.displayValue.replace(/\s+/g, '-')
+                    attribute.displayValue.replace(/\s+/g, '-').toLowerCase()
                   }${
                     isAttributeValueSelected(attribute) ? '-selected' : ''
                   }`}
@@ -147,7 +147,7 @@ const ProductAttributes = ({
                   }-attribute-${attributeSet.name.toLowerCase().replace(
                     /\s+/g,
                     '-'
-                  )}-${attribute.displayValue.replace(/\s+/g, '-')}${
+                  )}-${attribute.displayValue.replace(/\s+/g, '-').toLowerCase()}${
                     isAttributeValueSelected(attribute) ? '-selected' : ''
                   }`}
                 >
@@ -163,7 +163,7 @@ const ProductAttributes = ({
         <>
           <h3 className="mt-6 mb-2 font-bold uppercase font-roboto-condensed">Price:</h3>
           <div className="mb-5 text-2xl font-bold font-raleway" data-testid="product-price">
-            {price && `${price.currency.symbol}${price.amount}`}
+            {price && `${price.currency.symbol}${parseFloat(price.amount).toFixed(2)}`}
           </div>
         </>
       )}

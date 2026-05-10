@@ -4,6 +4,8 @@ namespace App\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ObjectType;
+use App\GraphQL\Resolvers\AttributeSetResolver;
+use App\Models\Price;
 
 class ProductType extends ObjectType
 {
@@ -18,8 +20,14 @@ class ProductType extends ObjectType
                 'gallery' => Type::listOf(Type::string()),
                 'description' => Type::string(),
                 'category' => Type::string(),
-                'attributes' => Type::listOf(new AttributeSetType()),
-                'prices' => Type::listOf(new PriceType()),
+                'attributes' => [
+                    'type' => Type::listOf(new AttributeSetType()),
+                    'resolve' => static fn ($product) => AttributeSetResolver::resolve($product['id']),
+                ],
+                'prices' => [
+                    'type' => Type::listOf(new PriceType()),
+                    'resolve' => static fn ($product) => Price::getByProductId($product['id']),
+                ],
                 'brand' => Type::string(),
             ],
         ]);

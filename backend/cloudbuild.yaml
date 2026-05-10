@@ -1,0 +1,44 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/scandiweb-backend/scandiweb-backend:latest', '.']
+    dir: '.'
+
+  # Push the container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/scandiweb-backend/scandiweb-backend:latest']
+
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'scandiweb-backend'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/scandiweb-backend/scandiweb-backend:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'DB_HOST=127.0.0.1,DB_PORT=3306,DB_NAME=scandiweb_ecommerce,DB_USER=med,DB_CHARSET=utf8mb4'
+      - '--set-secrets'
+      - 'DB_PASSWORD=db-password:latest'
+      - '--add-cloudsql-instances'
+      - 'project-a1cdb601-7c1f-492f-bcc:us-central1:free-trial-first-project'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--concurrency'
+      - '80'
+      - '--max-instances'
+      - '5'
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/scandiweb-backend/scandiweb-backend:latest'
+
+options:
+  logging: LEGACY

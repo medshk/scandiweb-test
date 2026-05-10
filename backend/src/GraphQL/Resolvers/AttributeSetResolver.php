@@ -1,21 +1,15 @@
 <?php
 
-namespace App\Models;
+namespace App\GraphQL\Resolvers;
 
 use App\Database;
+use App\Factories\AttributeFactory;
 
-abstract class Attribute extends Model
+class AttributeSetResolver
 {
-    protected static string $table = 'attributes';
-
-    abstract public function getDisplayType(): string;
-    abstract public function formatDisplayValue(string $value): string;
-    abstract public function getInputType(): string;
-
-    public static function getByProductId($productId)
+    public static function resolve(string $productId): array
     {
         $db = new Database();
-        $attributes = [];
         $items = $db->query(
             'SELECT 
                 pa.*, 
@@ -34,11 +28,12 @@ abstract class Attribute extends Model
             ]
         )->get();
 
+        $grouped = [];
         foreach ($items as $item) {
             $attributeId = $item['attribute_id'];
 
-            if (!isset($attributes[$attributeId])) {
-                $attributes[$attributeId] = [
+            if (!isset($grouped[$attributeId])) {
+                $grouped[$attributeId] = [
                     'id' => $attributeId,
                     'attribute_id' => $attributeId,
                     'name' => $item['attribute_name'],
@@ -47,7 +42,7 @@ abstract class Attribute extends Model
                 ];
             }
 
-            $attributes[$attributeId]['items'][] = [
+            $grouped[$attributeId]['items'][] = [
                 'id' => $item['displayvalue'] ?? $item['value'],
                 'attribute_id' => $attributeId,
                 'value' => $item['value'],
@@ -55,6 +50,11 @@ abstract class Attribute extends Model
             ];
         }
 
-        return $attributes;
+        $result = [];
+        foreach ($grouped as $attributeSetData) {
+            $result[] = AttributeFactory::createAttributeSet($attributeSetData);
+        }
+
+        return $result;
     }
 }
