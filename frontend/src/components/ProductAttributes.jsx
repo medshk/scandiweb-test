@@ -119,7 +119,7 @@ const ProductAttributes = ({
                   data-testid={`${
                     isModalView || isCartPageView ? 'cart-item' : 'product'
                   }-attribute-${attributeSet.name.toLowerCase().replace(/\s+/g, '-')}-${
-                    attribute.displayValue.replace(/\s+/g, '-').toLowerCase()
+                    attribute.displayValue.replace(/\s+/g, '-')
                   }${
                     isAttributeValueSelected(attribute) ? '-selected' : ''
                   }`}
@@ -147,7 +147,7 @@ const ProductAttributes = ({
                   }-attribute-${attributeSet.name.toLowerCase().replace(
                     /\s+/g,
                     '-'
-                  )}-${attribute.displayValue.replace(/\s+/g, '-').toLowerCase()}${
+                  )}-${attribute.displayValue.replace(/\s+/g, '-')}${
                     isAttributeValueSelected(attribute) ? '-selected' : ''
                   }`}
                 >
